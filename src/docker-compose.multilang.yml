@@ -1,0 +1,73 @@
+services:
+  # Infraestrutura (mantém como está)
+  broker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cc7261:proj
+    container_name: broker
+    volumes:
+      - ./broker:/app
+    ports:
+      - 5555:5555
+      - 5556:5556
+
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cc7261:proj
+    container_name: proxy
+    volumes:
+      - ./proxy:/app
+    ports:
+      - 5557:5557
+      - 5558:5558
+
+  reference:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cc7261:proj
+    container_name: reference
+    volumes:
+      - ./reference:/app
+    ports:
+      - 5559:5559
+
+  # SERVIDOR PYTHON
+  server-python:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cc7261:proj
+    volumes:
+      - ./server:/app
+      - server_python_data:/data
+    depends_on:
+      - broker
+      - proxy
+      - reference
+    environment:
+      - SERVER_NAME=server_python
+
+  # CLIENTE JAVASCRIPT
+  client-js:
+    build:
+      context: ./client-js
+      dockerfile: Dockerfile
+    depends_on:
+      - server-python
+    environment:
+      - USERNAME=cliente_js
+
+  # BOT GO
+  bot-go:
+    build:
+      context: ./bot-go
+      dockerfile: Dockerfile
+    depends_on:
+      - server-python
+
+volumes:
+  server_python_data:
