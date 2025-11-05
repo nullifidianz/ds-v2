@@ -1,5 +1,5 @@
 services:
-  # Infraestrutura (mantém como está)
+  # Infraestrutura básica (Python)
   broker:
     build:
       context: .

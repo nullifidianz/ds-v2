@@ -1,0 +1,154 @@
+# Configuração com TODAS as linguagens
+# 1 Servidor de cada + 1 Cliente de cada + 1 Bot de cada
+
+services:
+  # Infraestrutura
+  broker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cc7261:proj
+    container_name: broker
+    volumes:
+      - ./broker:/app
+    ports:
+      - 5555:5555
+      - 5556:5556
+
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cc7261:proj
+    container_name: proxy
+    volumes:
+      - ./proxy:/app
+    ports:
+      - 5557:5557
+      - 5558:5558
+
+  reference:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cc7261:proj
+    container_name: reference
+    volumes:
+      - ./reference:/app
+    ports:
+      - 5559:5559
+
+  # SERVIDORES (1 de cada linguagem)
+  server-python:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./server:/app
+      - server_python_data:/data
+    depends_on:
+      - broker
+      - proxy
+      - reference
+    environment:
+      - SERVER_NAME=server_python
+
+  server-js:
+    build:
+      context: ./server-js
+      dockerfile: Dockerfile
+    volumes:
+      - server_js_data:/data
+    depends_on:
+      - broker
+      - proxy
+      - reference
+    environment:
+      - SERVER_NAME=server_js
+
+  server-go:
+    build:
+      context: ./server-go
+      dockerfile: Dockerfile
+    volumes:
+      - server_go_data:/data
+    depends_on:
+      - broker
+      - proxy
+      - reference
+    environment:
+      - SERVER_NAME=server_go
+
+  # CLIENTES (1 de cada linguagem)
+  client-python:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./client:/app
+    depends_on:
+      - server-python
+      - server-js
+      - server-go
+    environment:
+      - USERNAME=cliente_python
+
+  client-js:
+    build:
+      context: ./client-js
+      dockerfile: Dockerfile
+    depends_on:
+      - server-python
+      - server-js
+      - server-go
+    environment:
+      - USERNAME=cliente_js
+
+  client-go:
+    build:
+      context: ./client-go
+      dockerfile: Dockerfile
+    depends_on:
+      - server-python
+      - server-js
+      - server-go
+    environment:
+      - USERNAME=cliente_go
+
+  # BOTS (1 de cada linguagem)
+  bot-python:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./bot:/app
+    depends_on:
+      - server-python
+      - server-js
+      - server-go
+
+  bot-js:
+    build:
+      context: ./bot-js
+      dockerfile: Dockerfile
+    depends_on:
+      - server-python
+      - server-js
+      - server-go
+
+  bot-go:
+    build:
+      context: ./bot-go
+      dockerfile: Dockerfile
+    depends_on:
+      - server-python
+      - server-js
+      - server-go
+
+volumes:
+  server_python_data:
+  server_js_data:
+  server_go_data:
+

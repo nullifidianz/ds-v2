@@ -9,22 +9,26 @@ O sistema é composto por diversos componentes distribuídos que se comunicam at
 ### Componentes Principais
 
 1. **Broker** (Request-Reply Router)
+
    - Implementa o padrão ROUTER/DEALER
    - Balanceia carga entre servidores usando round-robin
    - Portas: 5555 (ROUTER para clientes), 5556 (DEALER para servidores)
 
 2. **Proxy** (Publisher-Subscriber)
+
    - Implementa o padrão XPUB/XSUB
    - Gerencia publicações em canais e mensagens privadas
    - Portas: 5557 (XSUB para publishers), 5558 (XPUB para subscribers)
 
 3. **Servidor de Referência**
+
    - Gerencia registro e rank de servidores
    - Mantém lista de servidores ativos via heartbeat
    - Fornece serviços: rank, list, heartbeat
    - Porta: 5559
 
 4. **Servidores** (3 réplicas em 3 linguagens)
+
    - Python: Servidor principal com todas as funcionalidades
    - JavaScript/Node.js: Servidor equivalente
    - Go: Servidor equivalente
@@ -33,6 +37,7 @@ O sistema é composto por diversos componentes distribuídos que se comunicam at
    - Replicam dados entre si
 
 5. **Clientes**
+
    - Python: Cliente interativo com menu
    - JavaScript: Cliente automatizado
    - Go: Cliente automatizado
@@ -49,6 +54,7 @@ O sistema é composto por diversos componentes distribuídos que se comunicam at
 ## Funcionalidades Implementadas
 
 ### Parte 1: Request-Reply
+
 - ✅ Login de usuários (sem senha)
 - ✅ Listagem de usuários cadastrados
 - ✅ Criação de canais
@@ -56,6 +62,7 @@ O sistema é composto por diversos componentes distribuídos que se comunicam at
 - ✅ Persistência em JSON
 
 ### Parte 2: Publisher-Subscriber
+
 - ✅ Publicações em canais públicos
 - ✅ Mensagens privadas entre usuários
 - ✅ Bots automatizados
@@ -63,11 +70,13 @@ O sistema é composto por diversos componentes distribuídos que se comunicam at
 - ✅ Persistência de mensagens e publicações
 
 ### Parte 3: MessagePack
+
 - ✅ Serialização binária usando MessagePack
 - ✅ Substituição completa de JSON por MessagePack nas mensagens
 - ✅ Comunicação entre diferentes linguagens
 
 ### Parte 4: Relógios
+
 - ✅ Relógio lógico em todos os processos (cliente, bot, servidor)
 - ✅ Servidor de referência com gerenciamento de ranks
 - ✅ Heartbeat para detecção de servidores ativos
@@ -76,6 +85,7 @@ O sistema é composto por diversos componentes distribuídos que se comunicam at
 - ✅ Inscrição em tópico 'servers' para notificações de eleição
 
 ### Parte 5: Replicação de Dados
+
 - ✅ Replicação entre servidores via tópico 'replication'
 - ✅ Merge de dados (usuários e canais)
 - ✅ Sincronização periódica (a cada 30 segundos)
@@ -93,7 +103,8 @@ O sistema implementa **replicação eventual** usando o padrão Publisher-Subscr
 
 2. **Recepção e Merge**: Todos os servidores estão inscritos no tópico `replication` e recebem as publicações dos outros servidores.
 
-3. **Merge de Dados**: 
+3. **Merge de Dados**:
+
    - Quando um servidor recebe dados de outro servidor, ele faz o merge:
      - Adiciona usuários que não existem localmente
      - Adiciona canais que não existem localmente
@@ -105,12 +116,14 @@ O sistema implementa **replicação eventual** usando o padrão Publisher-Subscr
    - Não há remoção de dados, apenas adição
 
 #### Vantagens:
+
 - Simples de implementar
 - Tolerante a falhas (servidores podem sair e entrar)
 - Sem necessidade de coordenação central para replicação
 - Funciona bem para dados append-only
 
 #### Limitações:
+
 - Latência de até 30 segundos para propagação
 - Não garante consistência forte
 - Adequado apenas para operações de adição
@@ -190,7 +203,7 @@ src/
 - Docker
 - Docker Compose
 
-### Executar o Sistema
+### Opção 1: Sistema Básico (Apenas Python)
 
 ```bash
 cd src
@@ -198,6 +211,7 @@ docker-compose up --build
 ```
 
 Isso irá iniciar:
+
 - 1 Broker
 - 1 Proxy
 - 1 Servidor de Referência
@@ -205,36 +219,68 @@ Isso irá iniciar:
 - 1 Cliente Python
 - 2 Bots Python
 
+### Opção 2: Comunicação Multi-Linguagem (Python + JS + Go)
+
+```bash
+cd src
+docker-compose -f docker-compose.multilang.yml up --build
+```
+
+Isso irá iniciar:
+
+- Infraestrutura (Python)
+- 1 Servidor Python
+- 1 Cliente JavaScript
+- 1 Bot Go
+
+**Demonstra comunicação entre 3 linguagens diferentes!**
+
+### Opção 3: Sistema Completo (Todas as Linguagens)
+
+```bash
+cd src
+docker-compose -f docker-compose.all-langs.yml up --build
+```
+
+Isso irá iniciar:
+
+- Infraestrutura (Python)
+- 3 Servidores (1 Python + 1 JS + 1 Go)
+- 3 Clientes (1 Python + 1 JS + 1 Go)
+- 3 Bots (1 Python + 1 JS + 1 Go)
+
+**Demonstra comunicação completa entre todas as linguagens!**
+
 ### Executar com Servidores JavaScript e Go
 
 Para adicionar servidores em outras linguagens ao `docker-compose.yml`:
 
 ```yaml
-  server-js:
-    build:
-      context: ./server-js
-      dockerfile: Dockerfile
-    depends_on:
-      - broker
-      - proxy
-      - reference
-    volumes:
-      - server_js_data:/data
-    environment:
-      - SERVER_NAME=server_js
+server-js:
+  build:
+    context: ./server-js
+    dockerfile: Dockerfile
+  depends_on:
+    - broker
+    - proxy
+    - reference
+  volumes:
+    - server_js_data:/data
+  environment:
+    - SERVER_NAME=server_js
 
-  server-go:
-    build:
-      context: ./server-go
-      dockerfile: Dockerfile
-    depends_on:
-      - broker
-      - proxy
-      - reference
-    volumes:
-      - server_go_data:/data
-    environment:
-      - SERVER_NAME=server_go
+server-go:
+  build:
+    context: ./server-go
+    dockerfile: Dockerfile
+  depends_on:
+    - broker
+    - proxy
+    - reference
+  volumes:
+    - server_go_data:/data
+  environment:
+    - SERVER_NAME=server_go
 ```
 
 E adicionar os volumes:
@@ -334,4 +380,3 @@ Desenvolvido como projeto da disciplina de Sistemas Distribuídos.
 ## Licença
 
 Projeto acadêmico sem licença específica.
-
