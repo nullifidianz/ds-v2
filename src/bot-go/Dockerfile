@@ -4,10 +4,8 @@ WORKDIR /app
 
 RUN apk add --no-cache gcc musl-dev zeromq-dev
 
-COPY go.mod go.sum* ./
-RUN go mod download
-
 COPY . .
+RUN go mod tidy && go mod download
 RUN go build -o main .
 
 FROM alpine:latest
