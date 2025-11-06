@@ -38,7 +38,9 @@ Servers <--Pub/Sub--> replication (eventos de write)
 ## Formatos de Mensagem
 
 ### Protocolo Base
+
 Todas as mensagens seguem o formato:
+
 ```json
 {
   "service": "nome_servico",
@@ -53,6 +55,7 @@ Todas as mensagens seguem o formato:
 ### Serviços Implementados
 
 #### Req/Rep Services
+
 - **login**: Cadastro de usuário
 - **users**: Lista usuários cadastrados
 - **channel**: Criação de canal público
@@ -61,6 +64,7 @@ Todas as mensagens seguem o formato:
 - **message**: Mensagem privada
 
 #### Pub/Sub Topics
+
 - `{username}`: Mensagens privadas
 - `{channel}`: Publicações no canal
 - `servers`: Anúncios de eleição
@@ -76,17 +80,20 @@ Todas as mensagens seguem o formato:
 ## Relógios e Sincronização
 
 ### Relógio Lógico (Lamport)
+
 - Implementado em todos os processos
 - Incremento antes de enviar mensagens
 - `max(local, received) + 1` ao receber
 - Campo `clock` em todas as mensagens
 
 ### Sincronização Física (Berkeley)
+
 - Executada pelo coordenador a cada 10 mensagens
 - Coordenador = servidor com menor rank ativo
 - Ajuste baseado na média dos relógios
 
 ### Eleição de Coordenador
+
 - **Bully Algorithm**: Servidor com maior rank ganha
 - Gatilho: Coordenador para de responder heartbeats
 - Anúncio via Pub/Sub no tópico `servers`
@@ -94,17 +101,20 @@ Todas as mensagens seguem o formato:
 ## Replicação
 
 ### Estratégia
+
 - **Streaming de Eventos**: Cada write gera evento no tópico `replication`
 - **Aplicação Idempotente**: Eventos aplicados por `(clock, server_id)`
 - **Total Order**: Lamport clock garante ordenação causal
 
 ### Eventos Replicados
+
 - `user_login`: Novo usuário
 - `channel_create`: Novo canal
 - `message_publish`: Publicação em canal
 - `message_send`: Mensagem privada
 
 ### Consistência
+
 - **Last Write Wins**: Conflitos resolvidos por Lamport timestamp
 - **Idempotência**: Eventos duplicados ignorados
 - **Recuperação**: Eventos replay após restart
@@ -112,6 +122,7 @@ Todas as mensagens seguem o formato:
 ## Execução
 
 ### Pré-requisitos
+
 - Docker e Docker Compose
 - Portas 5555-5559 disponíveis
 
@@ -123,7 +134,14 @@ cd src/
 docker-compose up --build
 
 # Cliente interativo
-docker-compose exec client bash
+docker-compose exec client ./start.sh
+
+# Bot automático
+docker-compose exec bot ./start.sh
+
+# Ou diretamente com npm
+docker-compose exec client npm start
+docker-compose exec bot npm start
 
 # Ver logs específicos
 docker-compose logs -f server
@@ -140,6 +158,7 @@ docker-compose down -v
 ```
 
 ### Configuração
+
 - **SERDE**: `JSON` (padrão) ou `MSGPACK`
 - **SERVER_NAME**: Nome do servidor (para múltiplas instâncias)
 - **Dados**: Montados em volume `data/`
@@ -147,6 +166,7 @@ docker-compose down -v
 ## Desenvolvimento
 
 ### Branches por Parte
+
 1. **parte1**: Req/Rep básico (login, users, channels)
 2. **parte2**: Pub/Sub (publish, message, bot)
 3. **parte3**: MessagePack
@@ -156,6 +176,7 @@ docker-compose down -v
 ### Testes por Parte
 
 #### Parte 1
+
 ```bash
 # Testar login
 docker-compose exec client bash
@@ -166,6 +187,7 @@ docker-compose exec server cat /data/users.json
 ```
 
 #### Parte 2
+
 ```bash
 # Bot deve publicar automaticamente
 docker-compose logs -f bot
@@ -176,6 +198,7 @@ docker-compose exec client bash
 ```
 
 #### Parte 4
+
 ```bash
 # Verificar relógios nos logs
 docker-compose logs -f server | grep clock
@@ -186,6 +209,7 @@ docker-compose logs -f server | grep coordinator
 ```
 
 #### Parte 5
+
 ```bash
 # Verificar replicação
 docker-compose logs -f server | grep "replicad"
@@ -207,20 +231,24 @@ docker-compose stop server
 ## Decisões de Design
 
 ### Linguagens
+
 - **Python**: Melhor suporte a ZeroMQ e threading para servidor complexo
 - **Node.js**: Simplicidade para clientes interativos
 - **Go**: Performance para servidor de referência com alta concorrência
 
 ### Persistência
+
 - **JSON**: Simples, legível, suficiente para protótipo
 - **JSONL**: Append-only para mensagens, eficiente para replicação
 
 ### Replicação
+
 - **Event Sourcing**: Permite rebuild consistente
 - **Lamport Ordering**: Garante causalidade sem relógio físico
 - **Total Replication**: Simplicidade vs. sharding futuro
 
 ### Sincronização
+
 - **Berkeley**: Adequado para poucos servidores
 - **Bully**: Simples de implementar vs. Raft/Paxos
 

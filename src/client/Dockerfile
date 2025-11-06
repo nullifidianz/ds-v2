@@ -6,5 +6,6 @@ COPY client/node/package*.json ./
 RUN npm install
 
 COPY client/node/ .
+COPY client/start.sh .
 
 CMD ["npm", "start"]

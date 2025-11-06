@@ -6,5 +6,6 @@ COPY bot/node/package*.json ./
 RUN npm install
 
 COPY bot/node/ .
+COPY bot/start.sh .
 
 CMD ["npm", "start"]
