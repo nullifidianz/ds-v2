@@ -1,0 +1,116 @@
+{
+  "login": {
+    "request": {
+      "service": "login",
+      "data": {
+        "user": "string",
+        "timestamp": "number",
+        "clock": "number"
+      }
+    },
+    "response": {
+      "service": "login",
+      "data": {
+        "status": "sucesso|erro",
+        "timestamp": "number",
+        "clock": "number",
+        "description": "string (optional)"
+      }
+    }
+  },
+  "users": {
+    "request": {
+      "service": "users",
+      "data": {
+        "timestamp": "number",
+        "clock": "number"
+      }
+    },
+    "response": {
+      "service": "users",
+      "data": {
+        "timestamp": "number",
+        "clock": "number",
+        "users": ["string"]
+      }
+    }
+  },
+  "channel": {
+    "request": {
+      "service": "channel",
+      "data": {
+        "channel": "string",
+        "timestamp": "number",
+        "clock": "number"
+      }
+    },
+    "response": {
+      "service": "channel",
+      "data": {
+        "status": "sucesso|erro",
+        "timestamp": "number",
+        "clock": "number",
+        "description": "string (optional)"
+      }
+    }
+  },
+  "channels": {
+    "request": {
+      "service": "channels",
+      "data": {
+        "timestamp": "number",
+        "clock": "number"
+      }
+    },
+    "response": {
+      "service": "channels",
+      "data": {
+        "timestamp": "number",
+        "clock": "number",
+        "channels": ["string"]
+      }
+    }
+  },
+  "publish": {
+    "request": {
+      "service": "publish",
+      "data": {
+        "user": "string",
+        "channel": "string",
+        "message": "string",
+        "timestamp": "number",
+        "clock": "number"
+      }
+    },
+    "response": {
+      "service": "publish",
+      "data": {
+        "status": "OK|erro",
+        "timestamp": "number",
+        "clock": "number",
+        "message": "string (optional)"
+      }
+    }
+  },
+  "message": {
+    "request": {
+      "service": "message",
+      "data": {
+        "src": "string",
+        "dst": "string",
+        "message": "string",
+        "timestamp": "number",
+        "clock": "number"
+      }
+    },
+    "response": {
+      "service": "message",
+      "data": {
+        "status": "OK|erro",
+        "timestamp": "number",
+        "clock": "number",
+        "message": "string (optional)"
+      }
+    }
+  }
+}
