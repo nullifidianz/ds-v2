@@ -53,6 +53,8 @@ class Server:
         self.rep_socket = self.context.socket(zmq.SUB)
         self.rep_socket.connect("tcp://proxy:5558")
         self.rep_socket.setsockopt_string(zmq.SUBSCRIBE, "replication")
+        # Também ouvir anúncios de eleição
+        self.rep_socket.setsockopt_string(zmq.SUBSCRIBE, "servers")
 
         # Estado da replicação
         self.applied_events = set()  # (clock, server_id) já aplicados
@@ -382,9 +384,23 @@ class Server:
                 [topic, message_raw] = self.rep_socket.recv_multipart()
                 message = serializer.deserialize(message_raw)
 
-                # Aplicar evento se não for do próprio servidor
-                if message.get("server_id") != self.server_id:
-                    self.apply_event(message)
+                if topic == b"replication":
+                    # Aplicar evento se não for do próprio servidor
+                    if message.get("server_id") != self.server_id:
+                        self.apply_event(message)
+
+                elif topic == b"servers":
+                    # Anúncio de novo coordenador
+                    data = message.get("data", {})
+                    new_coord = data.get("coordinator")
+                    clock_val = data.get("clock")
+                    ts = data.get("timestamp")
+                    if new_coord:
+                        prev = self.coordinator
+                        self.coordinator = new_coord
+                        print(f"[ELEIÇÃO] Novo coordenador eleito: {new_coord} (antes: {prev}) | clock={clock_val} ts={ts}")
+                    else:
+                        print(f"[ELEIÇÃO] Mensagem de eleição recebida: {message}")
 
             except Exception as e:
                 print(f"Erro no listener de replicação: {e}")
