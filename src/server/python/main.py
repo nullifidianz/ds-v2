@@ -327,10 +327,6 @@ class Server:
         if event_key in self.applied_events:
             return  # Já aplicado, ignorar
 
-        # Verificar se devemos aplicar (Lamport clock rule)
-        if event["clock"] <= self.clock.get_time():
-            return  # Evento muito antigo, ignorar
-
         event_type = event["type"]
         event_data = event["data"]
 
@@ -424,7 +420,7 @@ class Server:
             }
 
         # Adicionar usuário se não existir
-        if user not in self.users:
+        if not self._user_exists(user):
             self.users.append({
                 "name": user,
                 "login_timestamp": timestamp
@@ -480,7 +476,7 @@ class Server:
             }
 
         # Adicionar canal se não existir
-        if channel not in self.channels:
+        if not self._channel_exists(channel):
             self.channels.append({
                 "name": channel,
                 "created_timestamp": timestamp
