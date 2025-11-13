@@ -131,27 +131,24 @@ Todas as mensagens seguem o formato:
 ```bash
 # Construir e executar tudo
 cd src/
-docker-compose up --build
+docker-compose up --build -d
 
 # Cliente interativo
 docker-compose exec client ./start.sh
 
-# Bot automático
-docker-compose exec bot ./start.sh
-
-# Ou diretamente com npm
+# Ou diretamente com npm (cliente)
 docker-compose exec client npm start
-docker-compose exec bot npm start
 
 # Ver logs específicos
 docker-compose logs -f server
+docker-compose logs -f bot
 docker-compose logs -f reference
 
 # Alterar serialização
-SERDE=MSGPACK docker-compose up --build
+SERDE=MSGPACK docker-compose up --build -d
 
-# Escalar servidores
-docker-compose up --scale server=5
+# Escalar servidores e bots
+docker-compose up -d --scale server=5 --scale bot=3
 
 # Limpar
 docker-compose down -v
@@ -160,7 +157,7 @@ docker-compose down -v
 ### Configuração
 
 - **SERDE**: `JSON` (padrão) ou `MSGPACK`
-- **SERVER_NAME**: Nome do servidor (para múltiplas instâncias)
+- **SERVER_NAME**: Opcional; se ausente, usa `HOSTNAME` do container
 - **Dados**: Montados em volume `data/`
 
 ## Desenvolvimento

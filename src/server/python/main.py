@@ -25,7 +25,8 @@ class Server:
         self.clock = LamportClock()
 
         # Dados do servidor
-        self.server_name = server_name or os.getenv("SERVER_NAME", f"server-{os.getpid()}")
+        # Preferir nome configurado; caso contrário, usar HOSTNAME do container (único). Como fallback final, usa PID.
+        self.server_name = server_name or os.getenv("SERVER_NAME") or os.getenv("HOSTNAME", f"server-{os.getpid()}")
         self.rank = None
         self.coordinator = None
         self.other_servers = []

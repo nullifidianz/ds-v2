@@ -44,10 +44,11 @@ services:
       - proxy
       - reference
     environment:
-      - SERVER_NAME=${SERVER_NAME:-server1}
       - SERDE=${SERDE:-JSON}
     networks:
       - ds-v2
+    volumes:
+      - data:/data
 
   client:
     build:
@@ -69,7 +70,6 @@ services:
     build:
       context: .
       dockerfile: bot/Dockerfile
-    command: sleep infinity
     depends_on:
       server:
         condition: service_started

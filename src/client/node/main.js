@@ -142,12 +142,98 @@ class Client {
         return serializer.deserialize(response);
     }
 
+	async sendPrivateMessage() {
+		const question = (query) => new Promise(resolve => this.rl.question(query, resolve));
+
+		const dst = (await question('Destinatário (usuário): ')).trim();
+		if (!dst) {
+			console.log('Destinatário não pode ser vazio.');
+			return;
+		}
+
+		const text = (await question('Mensagem: ')).trim();
+		if (!text) {
+			console.log('Mensagem não pode ser vazia.');
+			return;
+		}
+
+		try {
+			const clock = this.clock.tick();
+			const response = await this.sendRequest({
+				service: 'message',
+				data: {
+					src: this.username,
+					dst: dst,
+					message: text,
+					timestamp: Date.now(),
+					clock: clock
+				}
+			});
+
+			if (response.data.clock) {
+				this.clock.update(response.data.clock);
+			}
+
+			if (response.data.status === 'OK') {
+				console.log(`Mensagem enviada para ${dst}. (clock: ${this.clock.getTime()})`);
+			} else {
+				console.log(`Erro ao enviar mensagem: ${response.data.message || response.data.description || 'Desconhecido'}`);
+			}
+		} catch (error) {
+			console.error('Erro ao enviar mensagem privada:', error.message);
+		}
+	}
+
+	async publishToChannel() {
+		const question = (query) => new Promise(resolve => this.rl.question(query, resolve));
+
+		const channel = (await question('Canal: ')).trim();
+		if (!channel) {
+			console.log('Canal não pode ser vazio.');
+			return;
+		}
+
+		const text = (await question('Mensagem: ')).trim();
+		if (!text) {
+			console.log('Mensagem não pode ser vazia.');
+			return;
+		}
+
+		try {
+			const clock = this.clock.tick();
+			const response = await this.sendRequest({
+				service: 'publish',
+				data: {
+					user: this.username,
+					channel: channel,
+					message: text,
+					timestamp: Date.now(),
+					clock: clock
+				}
+			});
+
+			if (response.data.clock) {
+				this.clock.update(response.data.clock);
+			}
+
+			if (response.data.status === 'OK') {
+				console.log(`Publicado em #${channel}. (clock: ${this.clock.getTime()})`);
+			} else {
+				console.log(`Erro ao publicar: ${response.data.message || response.data.description || 'Desconhecido'}`);
+			}
+		} catch (error) {
+			console.error('Erro ao publicar em canal:', error.message);
+		}
+	}
+
     showMenu() {
         console.log('\n=== Menu ===');
         console.log('1. Listar usuários');
         console.log('2. Criar canal');
-        console.log('3. Listar canais');
-        console.log('4. Sair');
+		console.log('3. Listar canais');
+		console.log('4. Enviar mensagem privada');
+		console.log('5. Publicar em canal');
+		console.log('6. Sair');
         console.log('============');
     }
 
@@ -174,8 +260,14 @@ class Client {
                     await this.listChannels();
                     break;
                 case '4':
-                    running = false;
-                    console.log('Saindo...');
+					await this.sendPrivateMessage();
+					break;
+				case '5':
+					await this.publishToChannel();
+					break;
+				case '6':
+					running = false;
+					console.log('Saindo...');
                     break;
                 default:
                     console.log('Opção inválida.');
