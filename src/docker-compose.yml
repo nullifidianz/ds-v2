@@ -31,7 +31,7 @@ services:
     ports:
       - "5559:5559"
     environment:
-      - SERDE=${SERDE:-JSON}
+      - SERDE=${SERDE:-MSGPACK}
     networks:
       - ds-v2
 
@@ -44,7 +44,7 @@ services:
       - proxy
       - reference
     environment:
-      - SERDE=${SERDE:-JSON}
+      - SERDE=${SERDE:-MSGPACK}
     networks:
       - ds-v2
     volumes:
@@ -62,7 +62,7 @@ services:
       server:
         condition: service_started
     environment:
-      - SERDE=${SERDE:-JSON}
+      - SERDE=${SERDE:-MSGPACK}
     networks:
       - ds-v2
 
@@ -74,7 +74,7 @@ services:
       server:
         condition: service_started
     environment:
-      - SERDE=${SERDE:-JSON}
+      - SERDE=${SERDE:-MSGPACK}
     networks:
       - ds-v2
 

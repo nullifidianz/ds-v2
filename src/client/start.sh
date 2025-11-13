@@ -1,4 +1,4 @@
 #!/bin/bash
-echo "=== DS-v2 Cliente ==="
+echo "=== Cliente Interativo ==="
 echo "Executando cliente interativo..."
 npm start

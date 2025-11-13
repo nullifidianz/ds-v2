@@ -5,17 +5,20 @@ Sistema completo de mensagens instantâneas com persistência, sincronização d
 ## 🚀 Como Executar
 
 ### Pré-requisitos
+
 - **Docker** (versão 20+)
 - **Docker Compose** (versão 2+)
 - **Git**
 
 ### 1. Clone o Repositório
+
 ```bash
 git clone <url-do-seu-repositorio>
 cd ds-v2
 ```
 
 ### 2. Executar o Sistema
+
 ```bash
 # Entrar no diretório do código
 cd src/
@@ -25,12 +28,14 @@ docker-compose up --build
 ```
 
 ### 3. Acessar o Cliente Interativo
+
 ```bash
 # Em outro terminal
 docker-compose exec client ./start.sh
 ```
 
 ### 4. Verificar Funcionamento
+
 ```bash
 # Ver todos os containers rodando
 docker-compose ps
@@ -46,6 +51,7 @@ docker-compose logs -f bot
 ## 🎯 Demonstração Rápida
 
 ### Cliente Interativo
+
 ```bash
 # Executar cliente
 docker-compose exec client ./start.sh
@@ -60,6 +66,7 @@ docker-compose exec client ./start.sh
 ```
 
 ### Bot Automático
+
 ```bash
 # O bot já está rodando automaticamente
 docker-compose logs -f bot
@@ -67,18 +74,19 @@ docker-compose logs -f bot
 
 ## 📋 Componentes do Sistema
 
-| Componente | Linguagem | Função |
-|------------|-----------|---------|
-| **Broker** | Python | Proxy Req/Rep entre clientes e servidores |
-| **Proxy** | Python | Proxy Pub/Sub para mensagens |
-| **Server** | Python | Servidor principal com lógica distribuída |
-| **Client** | Node.js | Cliente interativo |
-| **Bot** | Node.js | Cliente automático para testes |
-| **Reference** | Go | Servidor de referência para coordenação |
+| Componente    | Linguagem | Função                                    |
+| ------------- | --------- | ----------------------------------------- |
+| **Broker**    | Python    | Proxy Req/Rep entre clientes e servidores |
+| **Proxy**     | Python    | Proxy Pub/Sub para mensagens              |
+| **Server**    | Python    | Servidor principal com lógica distribuída |
+| **Client**    | Node.js   | Cliente interativo                        |
+| **Bot**       | Node.js   | Cliente automático para testes            |
+| **Reference** | Go        | Servidor de referência para coordenação   |
 
 ## 🔧 Configurações
 
 ### Serialização
+
 ```bash
 # JSON (padrão)
 docker-compose up --build
@@ -88,6 +96,7 @@ SERDE=MSGPACK docker-compose up --build
 ```
 
 ### Escalabilidade
+
 ```bash
 # Múltiplos servidores
 docker-compose up --scale server=3
@@ -112,11 +121,13 @@ docker-compose exec server ls -la /data/messages/
 ## 🛠️ Desenvolvimento
 
 ### Arquivos Importantes
+
 - `src/docker-compose.yml` - Configuração dos containers
 - `src/shared/docs/README.md` - Documentação completa
 - `src/shared/schemas/messages.json` - Formatos das mensagens
 
 ### Branches por Parte
+
 - `parte1`: Req/Rep básico
 - `parte2`: Pub/Sub
 - `parte3`: MessagePack
