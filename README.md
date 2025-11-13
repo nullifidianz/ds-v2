@@ -134,15 +134,6 @@ docker-compose exec server ls -la /data/messages/
 - `parte4`: Relógios lógicos
 - `parte5`: Replicação
 
-## 🎓 Critérios de Avaliação
-
-✅ **Cliente (2 pts)**: ZeroMQ, formatos, relógio lógico
-✅ **Bot (1.5 pts)**: Mesmo que cliente
-✅ **Broker/Proxy/Reference (1 pt)**: Funcionamento
-✅ **Servidor (4 pts)**: Berkeley + eleição + replicação
-✅ **Documentação (0.5 pts)**: README claro
-✅ **Apresentação (1 pt)**: Demonstração funcional
-
 ## 🧹 Limpeza
 
 ```bash
@@ -155,7 +146,4 @@ docker system prune -f
 ```
 
 ---
-
-**🎯 Sistema pronto para apresentação com pontuação máxima!** 🚀
-
 Para documentação completa, consulte `src/shared/docs/README.md`.
